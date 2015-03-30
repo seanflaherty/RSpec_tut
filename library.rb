@@ -1,22 +1,31 @@
-require 'spec_helper'
+class Library
+    attr_accessor :books
 
-describe "Library object" do
+    def initialize lib_file = false
+        @lib_file = lib_file
+        @books = @lib_file ? YAML::load(File.read(@lib_file)) : []
+    end
 
-    before :all do
-        lib_obj = [
-            Book.new("JavaScript: The Good Parts", "Douglas Crockford", :development),
-            Book.new("Designing with Web Standards", "Jeffrey Zeldman", :design),
-            Book.new("Don't Make me Think", "Steve Krug", :usability),
-            Book.new("JavaScript Patterns", "Stoyan Stefanov", :development),
-            Book.new("Responsive Web Design", "Ethan Marcotte", :design)
-        ]
-        File.open "books.yml", "w" do |f|
-            f.write YAML::dump lib_obj
+    def get_books_in_category category
+        @books.select do |book|
+            book.category == category
         end
     end
 
-    before :each do
-        @lib = Library.new "books.yml"
+    def add_book book
+        @books.push book
     end
 
+    def get_book title
+        @books.select do |book|
+            book.title == title
+        end.first
+    end
+
+    def save lib_file = false
+        @lib_file = lib_file || @lib_file || "library.yml"
+        File.open @lib_file, "w" do |f|
+            f.write YAML::dump @books
+        end
+    end
 end
